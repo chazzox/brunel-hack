@@ -1,6 +1,5 @@
 import { GoogleSpreadsheet, GoogleSpreadsheetWorksheet, ServiceAccountCredentials } from "google-spreadsheet";
-import { readFile } from "node:fs/promises";
-import { IScore, Score } from "./Score";
+import { IScore } from "./Score";
 
 class Spreadsheet {
   private scoreSheet: GoogleSpreadsheetWorksheet | null = null;
@@ -10,15 +9,11 @@ class Spreadsheet {
     return this.scoreSheet;
   }
 
-  async init() {
+  async init(authData: ServiceAccountCredentials) {
     const doc = new GoogleSpreadsheet(
       "1T04dipNZQAmCCZqYaAwboHIEWYFwX7P24fuiY5x9nPY"
     );
 
-    const authFile = await readFile("./serviceAccount.json", {
-      encoding: "utf-8",
-    });
-    const authData = JSON.parse(authFile) as ServiceAccountCredentials;
     await doc.useServiceAccountAuth(authData);
     await doc.loadInfo();
 
@@ -31,4 +26,5 @@ class Spreadsheet {
   }
 }
 
-export { Spreadsheet }
+export { Spreadsheet };
+
