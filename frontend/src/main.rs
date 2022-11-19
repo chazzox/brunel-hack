@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use yew::{classes, html};
+use yew::{html};
 
 enum Msg {
     AddOne,
@@ -23,10 +23,9 @@ impl Component for Model {
         match msg {
             Msg::AddOne => {
                 self.value += 1;
-                // the value has changed so we need to
-                // re-render for it to appear on the page
                 true
             }
+
         }
     }
 
@@ -34,9 +33,9 @@ impl Component for Model {
         // This gives us a component's "`Scope`" which allows us to send messages, etc to the component.
         let link = ctx.link();
         html! {
-            <root class={classes!("min-h-screen", "flex", "items-center", "justify-center")}>
-                <div class={classes!("bg-red-100", "w-96", "rounded-2xl", "shadow-2xl", "p-10")}>
-                    <button class={classes!("bg-sky-600", "p-1", "px-3", "block", "mx-auto")} onclick={link.callback(|_| Msg::AddOne)}>{ "+1" }</button>
+            <root class="min-h-screen flex items-center justify-center">
+                <div class="bg-red-100 w-96 rounded-2xl shadow-2xl p-10">
+                    <button class="btn-sky-600 btn" onclick={link.callback(|_| Msg::AddOne)}>{ "+1" }</button>
                     <p>{ self.value }</p>
                 </div>
             </root>
