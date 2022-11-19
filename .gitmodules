@@ -1,3 +1,0 @@
-[submodule "dance-mat-firmware/components/lvgl"]
-	path = dance-mat-firmware/components/lvgl
-	url = https://github.com/lvgl/lvgl
