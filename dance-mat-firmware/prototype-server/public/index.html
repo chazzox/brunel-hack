@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+   <title>Danny is a tit</title>
+</head>
+
+<body>
+   <textarea id="content" readonly=""></textarea>
+   <script type="text/javascript">
+      // Let us open a web socket
+      var ws = new WebSocket("ws://localhost:3000/input");
+
+      ws.onopen = function () {
+         console.log("Connected!");
+      };
+
+      ws.onmessage = function (evt) {
+         var received_msg = evt.data;
+         console.log("Data received: " + received_msg);
+      };
+
+      ws.onclose = function () {
+         // websocket is closed.
+         alert("Connection is closed.");
+      };
+
+      document.getElementById('content').addEventListener('keydown', function (e) {
+         var keyCode = e.key;
+
+         switch (keyCode) {
+            case "ArrowUp":
+               console.log("Up arrow down!");
+               ws.send(JSON.stringify({ "up": 1 }));
+               break;
+            case "ArrowLeft":
+               console.log("Left arrow down!");
+               ws.send(JSON.stringify({ "right": -1 }));
+               break;
+            case "ArrowRight":
+               console.log("Right arrow down!");
+               ws.send(JSON.stringify({ "right": 1 }));
+               break;
+            case "ArrowDown":
+               console.log("Down arrow Down!");
+               ws.send(JSON.stringify({ "up": -1 }));
+               break;
+            default:
+               break;
+         };
+      }, false);
+
+      document.getElementById('content').addEventListener('keyup', function (e) {
+         var keyCode = e.key;
+
+         switch (keyCode) {
+            case "ArrowUp":
+               console.log("Up arrow up!");
+               ws.send(JSON.stringify({ "up": 0 }));
+               break;
+            case "ArrowLeft":
+               console.log("Left arrow up!");
+               ws.send(JSON.stringify({ "right": 0 }));
+               break;
+            case "ArrowRight":
+               console.log("Right arrow up!");
+               ws.send(JSON.stringify({ "right": 0 }));
+               break;
+            case "ArrowDown":
+               console.log("Down arrow up!");
+               ws.send(JSON.stringify({ "up": 0 }));
+               break;
+            default:
+               break;
+         };
+      }, false);
+   </script>
+</body>
+
+</html>
