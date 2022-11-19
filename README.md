@@ -16,3 +16,21 @@ uhhhhhhhhh
 | LEFT_DOWN   | 1 << 5   | 32      | 0x20        |
 | RIGHT_DOWN  | 1 << 6   | 64      | 0x40        |
 | DOWN_DOWN   | 1 << 7   | 128     | 0x80        |
+
+### Highscore API
+
+The highscore API accepts JSON body only.
+Do not send `x-www-form-urlencoded` or `multipart/form-data`
+
+#### POST `/score`
+
+Take a picture of the winner and upload their score!
+
+> Ejemplos
+> 
+> ```json
+> {
+>   "name": "Danny Piper",
+>   "score": 16300
+> }
+> ```

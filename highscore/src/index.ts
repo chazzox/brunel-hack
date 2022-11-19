@@ -1,40 +1,28 @@
-import { Storage } from "@google-cloud/storage";
-import { ServiceAccountCredentials } from "google-spreadsheet";
-import { readFile, rm } from "node:fs/promises";
-import { Photographer } from "./Photographer";
-import { Spreadsheet } from "./Spreadsheet";
+import express from "express";
+import bodyParser from "body-parser";
+import { winner } from "./winner";
+import { isValidScore } from "./Score";
 
-const spreadsheet = new Spreadsheet();
-const photographer = new Photographer();
-const storage = new Storage({ keyFilename: "./serviceAccount.json" });
+const app = express();
 
-const main = async () => {
-  const authFile = await readFile("./serviceAccount.json", {
-    encoding: "utf-8",
+app
+  .use(bodyParser.json())
+  .post("/score", async (req, res, next) => {
+    if (isValidScore(req.body)) {
+      await winner(req.body);
+
+      res.status(200).json({ ok: true });
+    } else {
+      res.status(400).json({ ok: false });
+    }
+  })
+  .get("/testscore", async (req, res, next) => {
+    await winner({
+      name: "Danny Piper",
+      score: 32871,
+    });
+
+    res.status(200).json({ ok: true });
   });
-  const authData = JSON.parse(authFile);
 
-  let file = await photographer.takePhoto();
-  console.log(file);
-
-  const newFilename = Date.now().toString(10) + ".jpg";
-
-  await storage.bucket("highscore-members").upload(file, {
-    destination: newFilename,
-  });
-
-  console.log(newFilename);
-
-  await rm(file);
-
-  await spreadsheet.init(authData as ServiceAccountCredentials);
-  await spreadsheet.addScore({
-    name: "Danny",
-    score: 100,
-    photograph: `https://storage.googleapis.com/highscore-members/${newFilename}`,
-    image: "=IMAGE(INDIRECT(ADDRESS(ROW(),COLUMN()-1)))",
-    timestamp: Date.now(),
-  });
-};
-
-main();
+app.listen(8080);
