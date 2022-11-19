@@ -18,4 +18,5 @@ typedef struct wifi_state_t {
     int hosting;
 } wifi_state_t;
 
+void init_lcd();
 void display_state(wifi_state_t w_state, dance_mat_status_t dm_state);
