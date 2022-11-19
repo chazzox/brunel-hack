@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: CC0-1.0
  */
 
+#include <unistd.h>
 #include <stdio.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
@@ -11,10 +12,11 @@
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "./logger.h"
+#include "./touch.h"
 
 void app_main(void)
 {
-    printf("Hello world!\n");
+    lprintf(LOG_INFO, "Starting up\n");
 
     /* Print chip information */
     esp_chip_info_t chip_info;
@@ -41,4 +43,8 @@ void app_main(void)
     lprintf(LOG_INFO, "Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     // Start wifi thread and, controller thread
+    lprintf(LOG_INFO, "Setting hardware up...");
+    init_pads();
+
+    for (;; usleep(20)) print_pads(poll_pads());
 }
