@@ -18,6 +18,8 @@ let port = 3000;
 let app = express();
 let server = http.createServer(app).listen(port);
 
+let keyData = { up: 0, right: 0 };
+
 // Apply expressWs
 expressWs(app, server);
 
@@ -32,11 +34,18 @@ app.get("/", (req, res) => {
 app.ws("/input", async function (ws, req) {
   // After which we wait for a message and respond to it
   ws.on("message", async function (msg) {
-    let keyData = { up: 0, right: 0 };
-    keyData = { keyData, ...JSON.parse(msg) };
+    let parsedData = JSON.parse(msg);
+    keyData = {
+      up: parsedData.up || keyData.up,
+      right: parsedData.right || keyData.right,
+    };
+
     // If a message occurs, we'll console log it on the server
     console.log(`Key received: (${keyData.up}, ${keyData.right})`);
     // Start listening for messages
+
+    // Send a message back to the client
+    ws.send(JSON.stringify(keyData));
   });
 });
 
