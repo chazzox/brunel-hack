@@ -1,8 +1,17 @@
 #include <string.h>
 #include <stdio.h>
 #include "./status.h"
+#include "./hardware.h"
+#include "./logger.h"
 
 #define LCD_LEN 16
+#define LCD_H 2
+#define LCD_H_RES              80
+#define LCD_V_RES              14
+
+void init_lcd()
+{
+}
 
 void display_state(wifi_state_t w_state, dance_mat_status_t dm_state)
 {
