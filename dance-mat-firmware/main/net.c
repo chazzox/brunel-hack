@@ -7,6 +7,8 @@
 #include "./touch.h"
 #include <string.h>
 
+touch_pads_t *vile;
+
 // HTTP request handler function
 void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data, void *fn_data)
 {
@@ -32,7 +34,7 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data, void *fn_da
     } else if (ev == MG_EV_WS_MSG) {
         // Got websocket frame. Received data is wm->data. Echo it back!
         char msg[128];
-        snprintf(msg, sizeof(msg), "{'state': '%d'}", get_status((touch_pads_t *) fn_data));
+        snprintf(msg, sizeof(msg), "{'state': '%d'}", get_status(vile));
         mg_ws_send(c, msg, strlen(msg), WEBSOCKET_OP_TEXT);
     }
     // else if (ev == MG_EV_POLL && c->fn_data == 1L)
@@ -53,6 +55,6 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data, void *fn_da
     // }
     else if (ev == MG_EV_CLOSE) {
         // Connection closed. Remove it from the list.
-        lprintf(LOG_INFO, "%lu Connection closed", c->id);
+        lprintf(LOG_INFO, "%lu Connection closed\n", c->id);
     }
 }

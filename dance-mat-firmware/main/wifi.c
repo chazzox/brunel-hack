@@ -34,14 +34,14 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         if (s_retry_num < 3) {
             esp_wifi_connect();
             s_retry_num++;
-            lprintf(LOG_INFO,"retry to connect to the AP");
+            lprintf(LOG_INFO,"retry to connect to the AP\n");
         } else {
             xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
         }
-        lprintf(LOG_ERROR, "connect to the AP fail");
+        lprintf(LOG_ERROR, "connect to the AP fail\n");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *) event_data;
-        lprintf(LOG_INFO,"IP ADDRESS:" IPSTR, IP2STR(&event->ip_info.ip));
+        lprintf(LOG_INFO,"IP ADDRESS:" IPSTR "\n", IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -83,18 +83,18 @@ void wifi_init(const char *ssid, const char *pass)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &c));
     ESP_ERROR_CHECK(esp_wifi_start());
-    lprintf(LOG_INFO, "wifi_init_sta finished.");
+    lprintf(LOG_INFO, "wifi_init_sta finished\n");
 
     EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
                                            WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
                                            pdFALSE, pdFALSE, portMAX_DELAY);
 
     if (bits & WIFI_CONNECTED_BIT) {
-        lprintf(LOG_INFO,"connected to ap SSID:%s password:%s", ssid, pass);
+        lprintf(LOG_INFO,"connected to ap SSID:%s password:%s\n", ssid, pass);
     } else if (bits & WIFI_FAIL_BIT) {
-        lprintf(LOG_ERROR,"Failed to connect to SSID:%s, password:%s", ssid, pass);
+        lprintf(LOG_ERROR,"Failed to connect to SSID:%s, password:%s\n", ssid, pass);
     } else {
-        lprintf(LOG_ERROR, "UNEXPECTED EVENT");
+        lprintf(LOG_ERROR, "UNEXPECTED EVENT\n");
     }
 
     /* The event will not be processed after unregister */

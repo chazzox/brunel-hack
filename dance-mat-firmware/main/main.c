@@ -67,7 +67,7 @@ void app_main(void)
     struct mg_mgr mgr;
     mg_log_set(MG_LL_DEBUG); // Set log level
     mg_mgr_init(&mgr);
-    mgr.userdata = (void *) &output;
+    vile = &output;
 
     lprintf(LOG_INFO, "Mongoose v%s on %s", MG_VERSION, s_listening_url);
     mg_http_listen(&mgr, s_listening_url, device_hooks_fn, &mgr);
