@@ -27,7 +27,7 @@
 	$: rate = !userIsCorrect ? 0.35 : 0.1;
 
 	const getWords = ({ length }: { length: number }) => {
-		const validInputs = ['🈚', '🈷️', '❌'];
+		const validInputs = ['⬆️', '⬇️', '⬅️', '➡️'];
 		const output = [];
 
 		for (let i = 0; i < length; i++) {
