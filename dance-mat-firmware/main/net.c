@@ -28,13 +28,14 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data, void *fn_da
             mg_http_reply(c, 404, NULL, "Resource not found\n");
         }
 
-        lprintf(LOG_INFO, "%lu %.*s %.*s -> %.*s", c->id, (int)hm->method.len,
+        lprintf(LOG_INFO, "%lu %.*s %.*s -> %.*s\n", c->id, (int)hm->method.len,
                 hm->method.ptr, (int)hm->uri.len, hm->uri.ptr, (int)3,
                 &c->send.buf[9]);
     } else if (ev == MG_EV_WS_MSG) {
         // Got websocket frame. Received data is wm->data. Echo it back!
         char msg[128];
-        snprintf(msg, sizeof(msg), "{'state': '%d'}", get_status(vile));
+        snprintf(msg, sizeof(msg), "{'state': %d}", get_status(vile));
+        lprintf(LOG_INFO, "State str %s\n", msg);
         mg_ws_send(c, msg, strlen(msg), WEBSOCKET_OP_TEXT);
     }
     // else if (ev == MG_EV_POLL && c->fn_data == 1L)

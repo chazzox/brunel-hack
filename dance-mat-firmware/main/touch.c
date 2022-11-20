@@ -10,7 +10,10 @@
 #define PERIOD 10
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0)); \
   lprintf(LOG_INFO, "Pad %d setup...\n", a);
-#define pad_read(a, b, c) touch_pad_read(a, b); /*if (calibrate_flag - TUNING_AMOUNT) { c = *b; }*/ (*b) = (*b) < c;
+#define pad_read(a, b, c) touch_pad_read(a, b); \
+  /*if (calibrate_flag) { c = (*b) - TUNING_AMOUNT; }*/ \
+  printf(#a ": %d ", *b); \
+  (*b) = (*b) < c;
 
 static void poll_pads(void *ptr)
 {
@@ -19,15 +22,41 @@ static void poll_pads(void *ptr)
 
     while (1) {
         pthread_mutex_lock(&ret_v->lock);
-        pad_read(START_PAD, &ret_v->start_pad, START_T);
-        pad_read(SELECT_PAD, &ret_v->select_pad, SELECT_T);
-        pad_read(X_PAD, &ret_v->x_pad, X_T);
-        pad_read(O_PAD, &ret_v->o_pad, O_T);
-        pad_read(LEFT_PAD, &ret_v->left_pad, LEFT_T);
-        pad_read(RIGHT_PAD, &ret_v->right_pad, RIGHT_T);
-        pad_read(UP_PAD, &ret_v->up_pad, UP_T);
-        pad_read(DOWN_PAD, &ret_v->down_pad, DOWN_T);
+        touch_pad_read(START_PAD, &ret_v->start_pad);
+        printf("START_PAD" ": %d ", *&ret_v->start_pad);
+        (*&ret_v->start_pad) = (*&ret_v->start_pad) > START_T;
+
+        touch_pad_read(SELECT_PAD, &ret_v->select_pad);
+        printf("SELECT_PAD" ": %d ", *&ret_v->select_pad);
+        (*&ret_v->select_pad) = (*&ret_v->select_pad) > SELECT_T;
+
+        touch_pad_read(X_PAD, &ret_v->x_pad);
+        printf("X_PAD" ": %d ", *&ret_v->x_pad);
+        (*&ret_v->x_pad) = (*&ret_v->x_pad) > X_T;
+
+        touch_pad_read(O_PAD, &ret_v->o_pad);
+        printf("O_PAD" ": %d ", *&ret_v->o_pad);
+        (*&ret_v->o_pad) = (*&ret_v->o_pad) > O_T;
+
+        touch_pad_read(LEFT_PAD, &ret_v->left_pad);
+        printf("LEFT_PAD" ": %d ", *&ret_v->left_pad);
+        (*&ret_v->left_pad) = (*&ret_v->left_pad) > LEFT_T;
+
+        touch_pad_read(RIGHT_PAD, &ret_v->right_pad);
+        printf("RIGHT_PAD" ": %d ", *&ret_v->right_pad);
+        (*&ret_v->right_pad) = (*&ret_v->right_pad) > RIGHT_T;
+
+        touch_pad_read(UP_PAD, &ret_v->up_pad);
+        printf("UP_PAD" ": %d ", *&ret_v->up_pad);
+        (*&ret_v->up_pad) = (*&ret_v->up_pad) < UP_T;
+
+        touch_pad_read(DOWN_PAD, &ret_v->down_pad);
+        printf("DOWN_PAD" ": %d ", *&ret_v->down_pad);
+        (*&ret_v->down_pad) = (*&ret_v->down_pad) < DOWN_T;
         pthread_mutex_unlock(&ret_v->lock);
+        puts("");
+
+        print_pads(ptr);
         calibrate_flag = 0;
 
         vTaskDelay(200 / PERIOD);
@@ -72,14 +101,16 @@ dance_mat_status_t get_status(touch_pads_t *pads)
 {
     dance_mat_status_t status = 0;
     pthread_mutex_lock(&pads->lock);
-    status |= START_PAD && pads->start_pad;
-    status |= SELECT_PAD && pads->select_pad;
-    status |= UP_PAD && pads->up_pad;
-    status |= DOWN_PAD && pads->down_pad;
-    status |= LEFT_PAD && pads->left_pad;
-    status |= RIGHT_PAD && pads->right_pad;
-    status |= X_PAD && pads->x_pad;
-    status |= O_PAD && pads->o_pad;
+    status |= START_PAD && pads->start_pad ? START_PAD : 0;
+    status |= SELECT_PAD && pads->select_pad ? SELECT_PAD : 0;
+    status |= UP_PAD && pads->up_pad ? UP_PAD : 0;
+    status |= DOWN_PAD && pads->down_pad ? DOWN_PAD : 0;
+    status |= LEFT_PAD && pads->left_pad ? LEFT_PAD : 0;
+    status |= RIGHT_PAD && pads->right_pad ? RIGHT_PAD : 0;
+    status |= X_PAD && pads->x_pad ? X_PAD : 0;
+    status |= O_PAD && pads->o_pad ? O_PAD : 0;
     pthread_mutex_unlock(&pads->lock);
+
+    print_pads(pads);
     return status;
 }

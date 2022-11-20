@@ -69,7 +69,7 @@ void app_main(void)
     mg_mgr_init(&mgr);
     vile = &output;
 
-    lprintf(LOG_INFO, "Mongoose v%s on %s", MG_VERSION, s_listening_url);
+    lprintf(LOG_INFO, "Mongoose v%s on %s\n", MG_VERSION, s_listening_url);
     mg_http_listen(&mgr, s_listening_url, device_hooks_fn, &mgr);
 
     for (;;) {
