@@ -7,7 +7,7 @@
 #include "esp_log.h"
 #include "./hardware.h"
 
-#define THRESHOLD 30
+#define THRESHOLD 10
 #define PERIOD 10
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0)); \
   lprintf(LOG_INFO, "Pad %d setup...\n", a);
@@ -52,14 +52,14 @@ static void poll_pads(void *ptr)
         if (calibrate_flag) {
             LEFT_T = (*&ret_v->left_pad);
         }
-        ret_v->left_pad = abs(ret_v->left_pad - LEFT_T) > 2 * THRESHOLD;
+        ret_v->left_pad = abs(ret_v->left_pad - LEFT_T) > THRESHOLD;
 
         touch_pad_read(RIGHT_PAD, &ret_v->right_pad);
         printf("RIGHT_PAD" ": %d ", *&ret_v->right_pad);
         if (calibrate_flag) {
             RIGHT_T = (*&ret_v->right_pad);
         }
-        ret_v->right_pad = abs(ret_v->right_pad - RIGHT_T) > 2 * THRESHOLD;
+        ret_v->right_pad = abs(ret_v->right_pad - RIGHT_T) > THRESHOLD;
 
         touch_pad_read(UP_PAD, &ret_v->up_pad);
         printf("UP_PAD" ": %d ", *&ret_v->up_pad);
@@ -87,7 +87,7 @@ static void poll_pads(void *ptr)
 void init_pads(touch_pads_t *ptr)
 {
     touch_pad_init();
-    touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
+    touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V8, TOUCH_HVOLT_ATTEN_1V);
 
     INIT(START_PAD);
     INIT(SELECT_PAD);
