@@ -1,0 +1,3 @@
+[submodule "dance-mat-firmware/mongoose"]
+	path = dance-mat-firmware/mongoose
+	url = https://github.com/cesanta/mongoose/
