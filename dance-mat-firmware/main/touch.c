@@ -46,7 +46,7 @@ static void poll_pads(void *ptr)
         if (calibrate_flag) {
             LEFT_T = (*&ret_v->left_pad);
         }
-        ret_v->left_pad = abs(ret_v->left_pad - LEFT_T) > THRESHOLD / 2;//ret_v->left_pad < 100; // cursed
+        ret_v->left_pad = abs(ret_v->left_pad - LEFT_T) < THRESHOLD / 2;//ret_v->left_pad < 100; // cursed
 
         touch_pad_read(RIGHT_PAD, &ret_v->right_pad);
         if (calibrate_flag) {
