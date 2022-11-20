@@ -34,7 +34,7 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data, void *fn_da
     } else if (ev == MG_EV_WS_MSG) {
         // Got websocket frame. Received data is wm->data. Echo it back!
         char msg[128];
-        snprintf(msg, sizeof(msg), "{'state': %d}", get_status(vile));
+        snprintf(msg, sizeof(msg), "{\"state\": %d,\"stop\":\"ddosing me you\"}", get_status(vile));
         lprintf(LOG_INFO, "State str %s\n", msg);
         mg_ws_send(c, msg, strlen(msg), WEBSOCKET_OP_TEXT);
     }
