@@ -6,6 +6,7 @@
   "packageManager": "yarn@3.3.0",
   "dependencies": {
     "@google-cloud/storage": "^6.7.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "google-spreadsheet": "^3.3.0",
     "robotjs": "^0.6.0",
@@ -13,6 +14,7 @@
     "win-control": "^0.3.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
     "@types/google-spreadsheet": "^3.3.0",
     "@types/node": "^18.11.9",

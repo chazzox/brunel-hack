@@ -2,10 +2,12 @@ import express from "express";
 import bodyParser from "body-parser";
 import { winner } from "./winner";
 import { isValidScore } from "./Score";
+import cors from "cors";
 
 const app = express();
 
 app
+  .use(cors())
   .use(bodyParser.json())
   .post("/score", async (req, res, next) => {
     if (isValidScore(req.body)) {

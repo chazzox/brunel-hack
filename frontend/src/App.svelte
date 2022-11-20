@@ -9,7 +9,7 @@
 
 	interface Payload {
 		state: number;
-		stop: "ddosing me you"
+		stop: 'ddosing me you';
 	}
 
 	let userIsCorrect = true;
@@ -21,100 +21,86 @@
 	// game state
 	let score = 0;
 	let progress = 100;
+	const wordLength = 10;
 	let words: string[] = [];
 	let rate = !userIsCorrect ? 0.35 : 0.1;
 	$: rate = !userIsCorrect ? 0.35 : 0.1;
 
-	const getWords = async (params: { [key: string]: any } = { length: 4, number: 10 }) => {
-		const endpoint = new URL('https://random-word-api.herokuapp.com/word');
+	const getWords = ({ length }: { length: number }) => {
+		const validInputs = ['🈚', '🈷️', '❌'];
+		const output = [];
 
-		Object.entries(params).map(([k, v]) => endpoint.searchParams.append(k, v));
+		for (let i = 0; i < length; i++) {
+			output.push(validInputs[Math.floor(validInputs.length * Math.random())])
+		}
 
-		const response = await fetch(endpoint);
-		return (await response.json()) as string[];
+		return output;
 	};
 
 	const makeSocket = () => {
-		socket = new WebSocket("ws://192.168.230.138:80/dance")
-	}
+		socket = new WebSocket('ws://192.168.230.138:80/dance');
+	};
 
-	const addChar = (char: string) => {
-		userText += char;
-	}
+	const handleChar = (char: string) => {
+		console.log(`Got ${char}, wordlist ${words.join(" ")}`)
+
+		if (words[0] === char) {
+			score++;
+			words = [words[1], words[2], words[3], words[4], words[5], words[6], words[7], words[8], words[9], ...getWords({ length: 1 })]
+		}
+	};
 
 	const addInput = (input: number) => {
-		// if (input & 1 << 0) addChar("🈚");
-		// if (input & 1 << 1) addChar("🈷️");
-		// if (input & 1 << 2) addChar("❌");
-		if (input & 1 << 3) addChar("⭕");
-		if (input & 1 << 4) addChar("⬆️");
-		if (input & 1 << 5) addChar("⬅️");
-		if (input & 1 << 6) addChar("➡️");
-		if (input & 1 << 7) addChar("⬇️");
-	}
+		if (input) didBeginTyping = true;
+		if (hasGameEnded) return;
+
+		if (input & (1 << 0)) handleChar('🈚');
+		if (input & (1 << 1)) handleChar('🈷️');
+		if (input & (1 << 2)) handleChar('❌');
+		if (input & (1 << 3)) handleChar('⭕');
+		if (input & (1 << 4)) handleChar('⬆️');
+		if (input & (1 << 5)) handleChar('⬅️');
+		if (input & (1 << 6)) handleChar('➡️');
+		if (input & (1 << 7)) handleChar('⬇️');
+	};
 
 	onMount(async () => {
-		words = await getWords();
+		words = getWords({ length: 10 });
 
 		makeSocket();
 
-		socket.addEventListener("open", () => {
-			console.log("Opened")
+		socket.addEventListener('open', () => {
+			console.log('Opened');
 
-			setInterval(() => {
+			const interval = setInterval(() => {
 				if (socket) {
-					console.log("sending awoo");
-					socket.send("awoo");
+					console.log('sending awoo');
+					socket.send('awoo');
 				}
-			}, 100)
-		})
 
-		socket.addEventListener("close", makeSocket)
-		socket.addEventListener("error", makeSocket)
+				if (hasGameEnded) {
+					clearInterval(interval);
+					socket.close();
+				}
+			}, 100);
+		});
 
-		socket.addEventListener("message", (e) => {
+		socket.addEventListener('close', makeSocket);
+		socket.addEventListener('error', makeSocket);
+
+		socket.addEventListener('message', (e) => {
 			console.log(e);
 
 			const payload = JSON.parse(e.data) as Payload;
 
-			addInput(payload.state)
-		})
+			addInput(payload.state);
+		});
 	});
 
 	$: if (words.length > 0) {
 		userIsCorrect = words.join(' ').startsWith(userText);
 		console.log(userIsCorrect, words, userText);
 	}
-
-	const handleEnterPress = async () => {
-		if (!userIsCorrect) {
-			// animation shake
-			return;
-		}
-		if (progress <= 0) return;
-
-		// removing words
-		const userWords = userText.split(' ');
-		let correctCount = userWords.length;
-
-		// checking for partial match of last matching word
-		const isLastWordPartial = words[correctCount - 1] != userWords[userWords.length - 1];
-		if (isLastWordPartial) correctCount--;
-
-		userText = '';
-		words = words.slice(correctCount);
-		words = [
-			...words,
-			...(await getWords({ length: score > 15 ? 10 : 5, number: correctCount }))
-		];
-
-		// updating game score
-		score += correctCount;
-
-		// add time to timer
-
-		progress = Math.min(100, progress + correctCount * 10);
-	};
 
 	const gameOver = () => {
 		hasGameEnded = true;
@@ -140,7 +126,7 @@
 		<Logo />
 		<div class="mx-auto text-white/80"><p>user score: {score}</p></div>
 
-		<div class="flex flex-1 flex-col items-center justify-center gap-24">
+		<div class="flex flex-1 flex-col items-center justify-center gap-24 text-6xl">
 			<p>{words.join(' ')}</p>
 		</div>
 
@@ -155,7 +141,7 @@
 			<input
 				on:keydown={(e) => {
 					didBeginTyping = true;
-					if (e.key == 'Enter') handleEnterPress();
+					// if (e.key == 'Enter') handleEnterPress();
 				}}
 				bind:value={userText}
 				disabled={hasGameEnded}
