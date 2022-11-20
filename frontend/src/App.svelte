@@ -7,8 +7,14 @@
 	import { onMount } from 'svelte';
 	import GameOver from './components/gameOver.svelte';
 
+	interface Payload {
+		state: number;
+		stop: "ddosing me you"
+	}
+
 	let userIsCorrect = true;
 	let userText = '';
+	let socket: WebSocket | null = null;
 
 	let hasGameEnded = false;
 	let didBeginTyping = false;
@@ -28,8 +34,51 @@
 		return (await response.json()) as string[];
 	};
 
+	const makeSocket = () => {
+		socket = new WebSocket("ws://192.168.230.138:80/dance")
+	}
+
+	const addChar = (char: string) => {
+		userText += char;
+	}
+
+	const addInput = (input: number) => {
+		// if (input & 1 << 0) addChar("🈚");
+		// if (input & 1 << 1) addChar("🈷️");
+		// if (input & 1 << 2) addChar("❌");
+		if (input & 1 << 3) addChar("⭕");
+		if (input & 1 << 4) addChar("⬆️");
+		if (input & 1 << 5) addChar("⬅️");
+		if (input & 1 << 6) addChar("➡️");
+		if (input & 1 << 7) addChar("⬇️");
+	}
+
 	onMount(async () => {
 		words = await getWords();
+
+		makeSocket();
+
+		socket.addEventListener("open", () => {
+			console.log("Opened")
+
+			setInterval(() => {
+				if (socket) {
+					console.log("sending awoo");
+					socket.send("awoo");
+				}
+			}, 100)
+		})
+
+		socket.addEventListener("close", makeSocket)
+		socket.addEventListener("error", makeSocket)
+
+		socket.addEventListener("message", (e) => {
+			console.log(e);
+
+			const payload = JSON.parse(e.data) as Payload;
+
+			addInput(payload.state)
+		})
 	});
 
 	$: if (words.length > 0) {
