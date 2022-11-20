@@ -41,22 +41,22 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data,
         struct mg_ws_message *wm = (struct mg_ws_message *)ev_data;
         mg_ws_send(c, wm->data.ptr, wm->data.len, WEBSOCKET_OP_TEXT);
     }
-    else if (ev == MG_EV_POLL && c->fn_data == 1L)
-    {
-        // blast data to the client
-        char *message[128];
+    // else if (ev == MG_EV_POLL && c->fn_data == 1L)
+    // {
+    //     // blast data to the client
+    //     char *message[128];
 
-        // HOW INPUT WORKS
-        // up value: (1) - Up, (0) - Neutral, (-1) - Down
-        // right value: (1) - Right, (0) - Neutral, (-1) - Left
-        // X, O, Start, Select value: (1) - Pressed, (0) - Neutral
-        // TODO: Send actual data
-        snprintf(message,
-                 sizeof(message),
-                 "{\"up\": %d, \"right\": %d, \"X\": %d, \"O\": %d, \"start\": %d, \"select\": %d}",
-                 0, 0, 0, 0, 0, 0);
-        mg_ws_send(c, message, sizeof(message), WEBSOCKET_OP_TEXT);
-    }
+    //     // HOW INPUT WORKS
+    //     // up value: (1) - Up, (0) - Neutral, (-1) - Down
+    //     // right value: (1) - Right, (0) - Neutral, (-1) - Left
+    //     // X, O, Start, Select value: (1) - Pressed, (0) - Neutral
+    //     // TODO: Send actual data
+    //     snprintf(message,
+    //              sizeof(message),
+    //              "{\"up\": %d, \"right\": %d, \"X\": %d, \"O\": %d, \"start\": %d, \"select\": %d}",
+    //              0, 0, 0, 0, 0, 0);
+    //     mg_ws_send(c, message, sizeof(message), WEBSOCKET_OP_TEXT);
+    // }
     else if (ev == MG_EV_CLOSE)
     {
         // Connection closed. Remove it from the list.
