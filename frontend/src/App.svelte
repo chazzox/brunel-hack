@@ -1,81 +1,126 @@
 <script lang="ts">
 	import Heart from './assets/heart.svelte';
+	import Progress from './components/progress.svelte';
 	import classnames from 'classnames';
 	import { onMount } from 'svelte';
-	import Progress from './components/progress.svelte';
-	import { stopTyping } from './utils';
-
-	let words: string[] = [];
 
 	let userIsCorrect = true;
-
 	let userText = '';
 
+	let hasGameEnded = false;
+	let didBeginTyping = false;
+	// game state
 	let score = 0;
+	let progress = 100;
+	let words: string[] = [];
+	let rate = !userIsCorrect ? 0.35 : 0.1;
+	$: rate = !userIsCorrect ? 0.35 : 0.1;
 
-	let hasUserTypeDebounced = true;
+	const getWords = async (params: { [key: string]: any } = { length: 4, number: 10 }) => {
+		const endpoint = new URL('https://random-word-api.herokuapp.com/word');
+
+		Object.entries(params).map(([k, v]) => endpoint.searchParams.append(k, v));
+
+		const response = await fetch(endpoint);
+		return (await response.json()) as string[];
+	};
 
 	onMount(async () => {
-		const response = await fetch(
-			'https://random-word-api.herokuapp.com/word?number=10&length=4'
-		);
-		words = (await response.json()) as string[];
+		words = await getWords();
 	});
 
 	$: if (words.length > 0) {
 		userIsCorrect = words.join(' ').startsWith(userText);
+		console.log(userIsCorrect, words, userText);
 	}
 
-	$: console.log('user text valid', userIsCorrect);
+	const handleEnterPress = async () => {
+		if (!userIsCorrect) {
+			// animation shake
+			return;
+		}
+		if (progress <= 0) return;
 
-	$: console.log('user stopped typing', hasUserTypeDebounced);
+		// removing words
+		const userWords = userText.split(' ');
+		let correctCount = userWords.length;
+
+		// checking for partial match of last matching word
+		const isLastWordPartial = words[correctCount - 1] != userWords[userWords.length - 1];
+		if (isLastWordPartial) correctCount--;
+
+		userText = '';
+		words = words.slice(correctCount);
+		words = [
+			...words,
+			...(await getWords({ length: score > 15 ? 10 : 5, number: correctCount }))
+		];
+
+		// updating game score
+		score += correctCount;
+
+		// add time to timer
+
+		progress = Math.min(100, progress + correctCount * 10);
+	};
+
+	const gameOver = () => {
+		hasGameEnded = true;
+	};
+
+	function step() {
+		progress = Math.max(0, progress - rate);
+
+		if (progress < 0.01) gameOver();
+		else requestAnimationFrame(step);
+	}
+
+	$: if (didBeginTyping) requestAnimationFrame(step);
 </script>
 
-<main
-	class={classnames(
-		'flex min-h-screen flex-col items-center bg-black p-10 text-white',
-		!userIsCorrect && 'neonIn'
-	)}
->
-	<div class="mx-auto text-white/80"><p>user score: {score}</p></div>
-
-	<div class="flex flex-1 flex-col items-center justify-center gap-24">
-		{#if words.length != 0}
-			<p>{words.join(' ')}</p>
-		{/if}
-	</div>
-
-	<Progress
-		isAccellerated={!userIsCorrect}
-		outOfTimeCallback={() => console.log('you ran out of time')}
-		isTyping={!hasUserTypeDebounced}
-	/>
-
-	<div
+{#if !hasGameEnded}
+	<main
 		class={classnames(
-			'my-10 flex h-16 w-11/12 items-center rounded-xl bg-zinc-900 p-2',
-			userIsCorrect ? 'shadow-xl shadow-white/10' : 'neon'
+			'flex min-h-screen flex-col items-center bg-black p-10 text-white',
+			!userIsCorrect && 'neonIn'
 		)}
 	>
-		<input
-			on:keydown={() => {
-				hasUserTypeDebounced = false;
-			}}
-			use:stopTyping
-			on:stopTyping={() => {
-				hasUserTypeDebounced = true;
-			}}
-			bind:value={userText}
-			placeholder="enter phrase"
-			type="text"
-			class="h-full w-full rounded-xl bg-black px-3 text-center
-		font-bold outline-none transition-colors duration-300 hover:bg-white/20"
-		/>
-	</div>
-	<div class="mx-auto my-2 text-white/60"
-		>made with <Heart classes="h-4 inline-block" /> by shitposting ltd</div
-	>
-</main>
+		<div class="mx-auto text-white/80"><p>user score: {score}</p></div>
+
+		<div class="flex flex-1 flex-col items-center justify-center gap-24">
+			<p>{words.join(' ')}</p>
+		</div>
+
+		<Progress {progress} />
+
+		<div
+			class={classnames(
+				'my-10 flex h-16 w-11/12 items-center rounded-xl bg-zinc-900 p-2',
+				userIsCorrect ? 'shadow-xl shadow-white/10' : 'neon'
+			)}
+		>
+			<input
+				on:keydown={(e) => {
+					didBeginTyping = true;
+					if (e.key == 'Enter') handleEnterPress();
+				}}
+				bind:value={userText}
+				disabled={hasGameEnded}
+				placeholder="enter phrase"
+				type="text"
+				class="h-full w-full rounded-xl bg-black px-3 text-center
+	font-bold outline-none transition-colors duration-300 hover:bg-white/20"
+			/>
+		</div>
+		<div class="mx-auto my-2 text-white/60"
+			>made with <Heart classes="h-4 inline-block" /> by shitposting ltd</div
+		>
+	</main>
+{:else}
+	<main class="flex min-h-screen flex-col items-center justify-center bg-black p-10 text-white">
+		oioi
+	</main>
+{/if}
 
 <style>
 	:global(.neon) {
