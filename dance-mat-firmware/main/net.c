@@ -7,28 +7,33 @@
 void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data,
                      void *fn_data)
 {
-    if (ev == MG_EV_HTTP_MSG)
+    if (ev == MG_EV_CONNECT)
+    {
+        c->fn_data = 0L;
+    }
+    else if (ev == MG_EV_HTTP_MSG)
     {
         struct mg_http_message *hm = (struct mg_http_message *)ev_data;
 
         if (mg_http_match_uri(hm, "/"))
         {
-            mg_http_reply(c, 200, "", "yo\n"); // Testing endpoint
+            mg_http_reply(c, 200, NULL, "yo\n"); // Testing endpoint
         }
         else if (mg_http_match_uri(hm, "/dance"))
         {
             // Upgrade to websocket. From now on, a connection is a full-duplex
             // Websocket connection, which will receive MG_EV_WS_MSG events.
             mg_ws_upgrade(c, hm, NULL);
+            c->fn_data = 1L;
         }
         else
         {
-            mg_http_reply(c, 404, "", "Resource not found\n");
+            mg_http_reply(c, 404, NULL, "Resource not found\n");
         }
 
-        MG_DEBUG(("%lu %.*s %.*s -> %.*s", c->id, (int)hm->method.len,
-                  hm->method.ptr, (int)hm->uri.len, hm->uri.ptr, (int)3,
-                  &c->send.buf[9]));
+        MG_INFO(("%lu %.*s %.*s -> %.*s", c->id, (int)hm->method.len,
+                 hm->method.ptr, (int)hm->uri.len, hm->uri.ptr, (int)3,
+                 &c->send.buf[9]));
     }
     else if (ev == MG_EV_WS_MSG)
     {
@@ -36,7 +41,7 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data,
         struct mg_ws_message *wm = (struct mg_ws_message *)ev_data;
         mg_ws_send(c, wm->data.ptr, wm->data.len, WEBSOCKET_OP_TEXT);
     }
-    else if (ev == MG_EV_POLL)
+    else if (ev == MG_EV_POLL && c->fn_data == 1L)
     {
         // blast data to the client
         char *message[128];
