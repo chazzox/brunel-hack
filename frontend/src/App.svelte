@@ -1,20 +1,9 @@
 <script lang="ts">
 	import Heart from './assets/heart.svelte';
-	import Progress from './components/progress.svelte';
-	import classnames from 'classnames';
+
 	import { onMount } from 'svelte';
-
-	let userIsCorrect = true;
-	let userText = '';
-
-	let hasGameEnded = false;
-	let didBeginTyping = false;
-	// game state
-	let score = 0;
-	let progress = 100;
-	let words: string[] = [];
-	let rate = !userIsCorrect ? 0.35 : 0.1;
-	$: rate = !userIsCorrect ? 0.35 : 0.1;
+	import Game from './components/game.svelte';
+	import classnames from 'classnames';
 
 	const getWords = async (params: { [key: string]: any } = { length: 4, number: 10 }) => {
 		const endpoint = new URL('https://random-word-api.herokuapp.com/word');
@@ -25,74 +14,45 @@
 		return (await response.json()) as string[];
 	};
 
+	let hasGameEnded = false;
+	let words: string[] = [];
+	let userIsCorrect = true;
+
+	let finalScore;
+	let userName;
+	let submittedData = false;
+
+	let userText = '';
+
 	onMount(async () => {
-		words = await getWords();
+		words = await getWords({ length: 5, number: 15 });
 	});
 
-	$: if (words.length > 0) {
-		userIsCorrect = words.join(' ').startsWith(userText);
-		console.log(userIsCorrect, words, userText);
-	}
-
-	const handleEnterPress = async () => {
-		if (!userIsCorrect) {
-			// animation shake
-			return;
-		}
-		if (progress <= 0) return;
-
-		// removing words
-		const userWords = userText.split(' ');
-		let correctCount = userWords.length;
-
-		// checking for partial match of last matching word
-		const isLastWordPartial = words[correctCount - 1] != userWords[userWords.length - 1];
-		if (isLastWordPartial) correctCount--;
-
-		userText = '';
-		words = words.slice(correctCount);
-		words = [
-			...words,
-			...(await getWords({ length: score > 15 ? 10 : 5, number: correctCount }))
-		];
-
-		// updating game score
-		score += correctCount;
-
-		// add time to timer
-
-		progress = Math.min(100, progress + correctCount * 10);
+	const submitScore = async () => {
+		if (hasGameEnded && !submittedData)
+			fetch(new URL('/testscore', 'base_url'), {
+				method: 'POST',
+				body: JSON.stringify({ name: userName, score: finalScore })
+			}).then((req) => {
+				if (req.status == 200) submittedData = true;
+			});
 	};
-
-	const gameOver = () => {
-		hasGameEnded = true;
-	};
-
-	function step() {
-		progress = Math.max(0, progress - rate);
-
-		if (progress < 0.01) gameOver();
-		else requestAnimationFrame(step);
-	}
-
-	$: if (didBeginTyping) requestAnimationFrame(step);
 </script>
 
 {#if !hasGameEnded}
-	<main
-		class={classnames(
-			'flex min-h-screen flex-col items-center bg-black p-10 text-white',
-			!userIsCorrect && 'neonIn'
-		)}
+	<Game
+		standardRate={0.1}
+		invalidRate={0.55}
+		onGameEndHandle={() => {
+			hasGameEnded = true;
+		}}
+		onInvalidInputChangeHandle={(n) => {
+			userIsCorrect = n;
+		}}
+		data={words}
+		getData={() => getWords({ length: 6, number: 4 })}
+		input={userText}
 	>
-		<div class="mx-auto text-white/80"><p>user score: {score}</p></div>
-
-		<div class="flex flex-1 flex-col items-center justify-center gap-24">
-			<p>{words.join(' ')}</p>
-		</div>
-
-		<Progress {progress} />
-
 		<div
 			class={classnames(
 				'my-10 flex h-16 w-11/12 items-center rounded-xl bg-zinc-900 p-2',
@@ -100,35 +60,32 @@
 			)}
 		>
 			<input
-				on:keydown={(e) => {
-					didBeginTyping = true;
-					if (e.key == 'Enter') handleEnterPress();
-				}}
 				bind:value={userText}
 				disabled={hasGameEnded}
 				placeholder="enter phrase"
 				type="text"
-				class="h-full w-full rounded-xl bg-black px-3 text-center
-	font-bold outline-none transition-colors duration-300 hover:bg-white/20"
+				class="h-full w-full rounded-xl bg-black px-3 text-center font-bold outline-none transition-colors duration-300 hover:bg-white/20"
 			/>
 		</div>
-		<div class="mx-auto my-2 text-white/60"
-			>made with <Heart classes="h-4 inline-block" /> by shitposting ltd</div
-		>
-	</main>
+		<div class="mx-auto my-2 text-white/60">
+			made with <Heart classes="h-4 inline-block" /> by shitposting ltd
+		</div>
+	</Game>
 {:else}
-	<main class="flex min-h-screen flex-col items-center justify-center bg-black p-10 text-white">
-		oioi
+	<main
+		class="flex min-h-screen flex-col items-center justify-center gap-4 bg-black p-10 text-white"
+	>
+		<p>
+			Game is over, please wait for a picture to be taken click the button below to save your
+			score restart the game
+		</p>
+		<input
+			class="text-font block rounded-3xl bg-white/20 px-4 py-1 text-center shadow-xl shadow-white/10 outline-none"
+			type="text"
+			bind:value={userName}
+		/>
+		<button class="rounded-3xl bg-white/30 px-2 text-white" on:click={submitScore}>
+			submit
+		</button>
 	</main>
 {/if}
-
-<style>
-	:global(.neon) {
-		box-shadow: 0 0 2rem #dc2626, 0 0 0.8rem #dc2626, 0 0 2rem #dc2626;
-	}
-
-	.neonIn {
-		box-shadow: 0 0 0.2rem #fff, 0 0 0.2rem #fff, 0 0 2rem #dc2626, 0 0 0.8rem #dc2626,
-			0 0 2.8rem #dc2626, inset 0 0 1.3rem #dc2626;
-	}
-</style>
