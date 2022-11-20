@@ -1,25 +1,25 @@
 #pragma once
 
 #define START_PAD TOUCH_PAD_NUM0
-#define START_T 0
+int START_T = 1455;
 
 #define SELECT_PAD TOUCH_PAD_NUM2
-#define SELECT_T 0
+int SELECT_T = 0;
 
 #define X_PAD TOUCH_PAD_NUM3
-#define X_T 630
+int X_T = 550;
 
-#define O_PAD TOUCH_PAD_NUM4
-#define O_T 320
+#define DOWN_PAD TOUCH_PAD_NUM4
+int DOWN_T = 35;
 
 #define LEFT_PAD TOUCH_PAD_NUM4
-#define LEFT_T 230
+int LEFT_T = 40;
 
 #define RIGHT_PAD TOUCH_PAD_NUM5
-#define RIGHT_T 790
+int RIGHT_T = 75;
 
 #define UP_PAD TOUCH_PAD_NUM6
-#define UP_T 230
+int UP_T = 670;
 
-#define DOWN_PAD TOUCH_PAD_NUM7
-#define DOWN_T 130
+#define O_PAD TOUCH_PAD_NUM7
+int O_T = 660;
