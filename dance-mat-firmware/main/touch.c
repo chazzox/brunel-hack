@@ -9,7 +9,7 @@
 #define PERIOD 10
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0)); \
   lprintf(LOG_INFO, "Pad %d setup...\n", a);
-#define pad_read(a, b, c) touch_pad_read(a, b); /*(*b) = (*b) < c;*/
+#define pad_read(a, b, c) touch_pad_read(a, b); (*b) = (*b) < c;
 
 static void poll_pads(void *ptr)
 {
@@ -63,4 +63,20 @@ void print_pads(touch_pads_t *ret)
             ret->up_pad,
             ret->down_pad);
     pthread_mutex_unlock(&ret->lock);
+}
+
+dance_mat_status_t get_status(touch_pads_t *pads)
+{
+    dance_mat_status_t status = 0;
+    pthread_mutex_lock(&pads->lock);
+    status |= START_PAD && pads->start_pad;
+    status |= SELECT_PAD && pads->select_pad;
+    status |= UP_PAD && pads->up_pad;
+    status |= DOWN_PAD && pads->down_pad;
+    status |= LEFT_PAD && pads->left_pad;
+    status |= RIGHT_PAD && pads->right_pad;
+    status |= X_PAD && pads->x_pad;
+    status |= O_PAD && pads->o_pad;
+    pthread_mutex_unlock(&pads->lock);
+    return status;
 }
