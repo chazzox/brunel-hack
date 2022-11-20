@@ -9,7 +9,7 @@
 #define PERIOD 10
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0)); \
   lprintf(LOG_INFO, "Pad %d setup...\n", a);
-#define pad_read(a, b, c) touch_pad_read(a, b); (*b) = (*b) < c;
+#define pad_read(a, b, c) touch_pad_read(a, b); /*(*b) = (*b) < c;*/
 
 static void poll_pads(void *ptr)
 {
