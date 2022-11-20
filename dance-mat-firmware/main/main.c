@@ -6,6 +6,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -43,8 +44,12 @@ void app_main(void)
     lprintf(LOG_INFO, "Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     // Start wifi thread and, controller thread
-    lprintf(LOG_INFO, "Setting hardware up...");
-    init_pads();
+    lprintf(LOG_INFO, "Setting hardware up...\n");
 
-    for (;; usleep(20)) print_pads(poll_pads());
+    touch_pads_t output;
+    memset(&output, 0, sizeof(output));
+
+    init_pads(&output);
+
+    for (;; usleep(20)) print_pads(&output);
 }
