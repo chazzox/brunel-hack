@@ -9,7 +9,7 @@
 #define PERIOD 10
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0)); \
   lprintf(LOG_INFO, "Pad %d setup...\n", a);
-#define pad_read(a, b) touch_pad_read(a, b);
+#define pad_read(a, b, c) touch_pad_read(a, b); (*b) = (*b) < c;
 
 static void poll_pads(void *ptr)
 {
@@ -17,14 +17,14 @@ static void poll_pads(void *ptr)
 
     while (1) {
         pthread_mutex_lock(&ret_v->lock);
-        pad_read(START_PAD, &ret_v->start_pad);
-        pad_read(SELECT_PAD, &ret_v->select_pad);
-        pad_read(X_PAD, &ret_v->x_pad);
-        pad_read(O_PAD, &ret_v->o_pad);
-        pad_read(LEFT_PAD, &ret_v->left_pad);
-        pad_read(RIGHT_PAD, &ret_v->right_pad);
-        pad_read(UP_PAD, &ret_v->up_pad);
-        pad_read(DOWN_PAD, &ret_v->down_pad);
+        pad_read(START_PAD, &ret_v->start_pad, START_T);
+        pad_read(SELECT_PAD, &ret_v->select_pad, SELECT_T);
+        pad_read(X_PAD, &ret_v->x_pad, X_T);
+        pad_read(O_PAD, &ret_v->o_pad, O_T);
+        pad_read(LEFT_PAD, &ret_v->left_pad, LEFT_T);
+        pad_read(RIGHT_PAD, &ret_v->right_pad, RIGHT_T);
+        pad_read(UP_PAD, &ret_v->up_pad, UP_T);
+        pad_read(DOWN_PAD, &ret_v->down_pad, DOWN_T);
         pthread_mutex_unlock(&ret_v->lock);
 
         vTaskDelay(200 / PERIOD);
