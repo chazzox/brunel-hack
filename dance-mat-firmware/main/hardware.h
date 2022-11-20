@@ -9,13 +9,13 @@ int SELECT_T = 0;
 #define X_PAD TOUCH_PAD_NUM3
 int X_T = 550;
 
-#define DOWN_PAD TOUCH_PAD_NUM6
+#define DOWN_PAD TOUCH_PAD_NUM9/*6*/
 int DOWN_T = 35;
 
 #define LEFT_PAD TOUCH_PAD_NUM4
 int LEFT_T = 40;
 
-#define RIGHT_PAD TOUCH_PAD_NUM5
+#define RIGHT_PAD TOUCH_PAD_NUM8/*5*/
 int RIGHT_T = 75;
 
 #define UP_PAD TOUCH_PAD_NUM4

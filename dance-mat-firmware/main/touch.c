@@ -8,7 +8,7 @@
 #include "./hardware.h"
 
 #define THRESHOLD 10
-#define PERIOD 10
+#define PERIOD 5
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0));
 
 static void poll_pads(void *ptr)
@@ -22,43 +22,44 @@ static void poll_pads(void *ptr)
         if (calibrate_flag) {
             START_T = (*&ret_v->start_pad);
         }
-        (*&ret_v->start_pad) = abs((*&ret_v->start_pad) - START_T) > THRESHOLD;
+        (ret_v->start_pad) = abs((*&ret_v->start_pad) - START_T) > THRESHOLD;
 
         touch_pad_read(SELECT_PAD, &ret_v->select_pad);
         if (calibrate_flag) {
             SELECT_T = (*&ret_v->select_pad);
         }
-        (*&ret_v->select_pad) = abs((*&ret_v->select_pad) - SELECT_T) > THRESHOLD;
+        (ret_v->select_pad) = abs((*&ret_v->select_pad) - SELECT_T) > THRESHOLD;
 
         touch_pad_read(X_PAD, &ret_v->x_pad);
         if (calibrate_flag) {
             X_T = (*&ret_v->x_pad);
         }
-        (*&ret_v->x_pad) = abs((*&ret_v->x_pad) - X_T) > THRESHOLD;
+        (ret_v->x_pad) = abs((*&ret_v->x_pad) - X_T) > THRESHOLD;
 
         touch_pad_read(O_PAD, &ret_v->o_pad);
         if (calibrate_flag) {
             O_T = (*&ret_v->o_pad);
         }
-        (*&ret_v->o_pad) = abs((*&ret_v->o_pad) - O_T) > THRESHOLD;
+        (ret_v->o_pad) = abs((*&ret_v->o_pad) - O_T) > THRESHOLD;
 
         touch_pad_read(LEFT_PAD, &ret_v->left_pad);
         if (calibrate_flag) {
             LEFT_T = (*&ret_v->left_pad);
         }
-        ret_v->left_pad = abs(ret_v->left_pad - LEFT_T) < THRESHOLD;
+        ret_v->left_pad = abs(ret->left_pad - LEFT_T) > THRESHOLD / 2;//ret_v->left_pad < 100; // cursed
 
         touch_pad_read(RIGHT_PAD, &ret_v->right_pad);
         if (calibrate_flag) {
             RIGHT_T = (*&ret_v->right_pad);
         }
-        ret_v->right_pad = abs(ret_v->right_pad - RIGHT_T) > THRESHOLD;
+        lprintf(LOG_WARNING, "\t%d\n", ret_v->right_pad);
+        ret_v->right_pad = abs(ret_v->right_pad - RIGHT_T) > THRESHOLD / 2;
 
         touch_pad_read(UP_PAD, &ret_v->up_pad);
         if (calibrate_flag) {
             UP_T = (*&ret_v->up_pad);
         }
-        ret_v->up_pad = abs(ret_v->up_pad - UP_T) < THRESHOLD;
+        ret_v->up_pad = ret_v->up_pad == 0;
 
         touch_pad_read(DOWN_PAD, &ret_v->down_pad);
         if (calibrate_flag) {
@@ -69,7 +70,7 @@ static void poll_pads(void *ptr)
 
         calibrate_flag = 0;
 
-        vTaskDelay(200 / PERIOD);
+        vTaskDelay(PERIOD);
     }
 }
 

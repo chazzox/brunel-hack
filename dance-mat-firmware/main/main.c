@@ -74,6 +74,6 @@ void app_main(void)
 
     for (;;) {
         mg_mgr_poll(&mgr, 150); // Infinite event loop
-        //print_pads(&output);
+        print_pads(&output);
     }
 }
