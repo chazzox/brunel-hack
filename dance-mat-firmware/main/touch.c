@@ -53,7 +53,7 @@ static void poll_pads(void *ptr)
             RIGHT_T = (*&ret_v->right_pad);
         }
         lprintf(LOG_WARNING, "\t%d\n", ret_v->right_pad);
-        ret_v->right_pad = abs(ret_v->right_pad - RIGHT_T) < THRESHOLD / 2;
+        ret_v->right_pad = abs(ret_v->right_pad - RIGHT_T) > 3;
 
         touch_pad_read(UP_PAD, &ret_v->up_pad);
         if (calibrate_flag) {
