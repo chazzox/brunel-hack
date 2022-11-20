@@ -15,7 +15,7 @@ void device_hooks_fn(struct mg_connection *c, int ev, void *ev_data,
         {
             mg_http_reply(c, 200, "", "yo\n"); // Testing endpoint
         }
-        else if (mg_http_match_uri(hm, "/input"))
+        else if (mg_http_match_uri(hm, "/dance"))
         {
             // Upgrade to websocket. From now on, a connection is a full-duplex
             // Websocket connection, which will receive MG_EV_WS_MSG events.
