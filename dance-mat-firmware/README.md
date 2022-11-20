@@ -21,15 +21,12 @@ You will be subscribed to updates of the dance mat state in the format of;
 
 ```json
 {
-  "up": 1,
-  "right": -1,
-  "X": 1,
-  "O": 0,
-  "start": 0,
-  "select": 0
+  "state": 1
 }
 ```
+State is made of the flags in [../readme.md](../readme.md) and, is good.
 
+### Wrong this
 #### `up`
 
 - 1: Up is pressed
