@@ -23,5 +23,3 @@ int UP_T = 670;
 
 #define O_PAD TOUCH_PAD_NUM7
 int O_T = 660;
-
-#define TUNING_AMOUNT 3
