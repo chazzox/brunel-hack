@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Heart from './assets/heart.svelte';
+	import Logo from "./assets/logo/index.svelte";
+
 	import classnames from 'classnames';
 
 	import { onMount } from 'svelte';
@@ -20,6 +22,8 @@
 </script>
 
 <main class="flex min-h-screen flex-col bg-black px-10 text-white">
+	<Logo />
+
 	<div class="flex flex-1 items-center justify-center">
 		{#if words.length != 0}
 			<p>{words}</p>
