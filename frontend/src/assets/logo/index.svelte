@@ -29,7 +29,7 @@
   }
 
   .logo {
-    padding-top: 4em;
+    padding-top: 3.2em;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -39,7 +39,7 @@
     // Top space space
     display: flex;
     gap: 2em;
-    padding-left: 10em;
+    padding-left: 6em;
   }
 
   .line2 {
@@ -58,7 +58,7 @@
   }
 
   .imageArrow {
-    height: 200px;
+    height: 150px;
   }
   
   .divH,
