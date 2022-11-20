@@ -5,14 +5,16 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "./hardware.h"
 
 #define PERIOD 10
 #define INIT(a) ESP_ERROR_CHECK(touch_pad_config(a, 0)); \
   lprintf(LOG_INFO, "Pad %d setup...\n", a);
-#define pad_read(a, b, c) touch_pad_read(a, b); (*b) = (*b) < c;
+#define pad_read(a, b, c) touch_pad_read(a, b); if (calibrate_flag - TUNING_AMOUNT) { c = *b; } (*b) = (*b) < c;
 
 static void poll_pads(void *ptr)
 {
+    int calibrate_flag = 1;
     touch_pads_t *ret_v = (touch_pads_t *) ptr;
 
     while (1) {
@@ -26,6 +28,7 @@ static void poll_pads(void *ptr)
         pad_read(UP_PAD, &ret_v->up_pad, UP_T);
         pad_read(DOWN_PAD, &ret_v->down_pad, DOWN_T);
         pthread_mutex_unlock(&ret_v->lock);
+        calibrate_flag = 0;
 
         vTaskDelay(200 / PERIOD);
     }

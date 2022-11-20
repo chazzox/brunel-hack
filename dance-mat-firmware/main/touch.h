@@ -1,5 +1,4 @@
 #pragma once
-#include "./hardware.h"
 #include <pthread.h>
 
 void init_pads();
