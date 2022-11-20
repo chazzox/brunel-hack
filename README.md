@@ -1,6 +1,8 @@
-uhhhhhhhhh
+# uhhhhhhhhh
 
-# canna get uhhhhh
+## HackBrunel V2 Submission
+
+## canna get uhhhhh
 
 ## Data Format
 
@@ -27,7 +29,7 @@ Do not send `x-www-form-urlencoded` or `multipart/form-data`
 Take a picture of the winner and upload their score!
 
 > Ejemplos
-> 
+>
 > ```json
 > {
 >   "name": "Danny Piper",
