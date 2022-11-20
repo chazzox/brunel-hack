@@ -1,53 +1,63 @@
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C6 | ESP32-H4 | ESP32-S2 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- | -------- |
+# Dance Mat firmware
 
-# Hello World Example
+This firmware enables an ESP32 device to blast data of the state of a PS1 dance mat over a websocket for use in a web frontend.
 
-Starts a FreeRTOS task to print "Hello World".
+## How to use
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+1. Compile using `idf.py build`
+2. Setup a WiFi hotspot with the SSID and Password of;
+   ```
+   SSID: DodgyPancake
+   Password: QLQEQ2QoKzkifhJc
+   ```
+3. Run the program using `idf.py flash monitor`
+4. Yeet
 
-## How to use example
+## Websocket communication schema
 
-Follow detailed instructions provided specifically for this example.
+### `GET /dance`
 
-Select the instructions depending on Espressif chip installed on your development board:
+You will be subscribed to updates of the dance mat state in the format of;
 
-- [ESP32 Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/stable/get-started/index.html)
-- [ESP32-S2 Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s2/get-started/index.html)
-
-
-## Example folder contents
-
-The project **hello_world** contains one source file in C language [hello_world_main.c](main/hello_world_main.c). The file is located in folder [main](main).
-
-ESP-IDF projects are built using CMake. The project build configuration is contained in `CMakeLists.txt` files that provide set of directives and instructions describing the project's source files and targets (executable, library, or both).
-
-Below is short explanation of remaining files in the project folder.
-
-```
-├── CMakeLists.txt
-├── pytest_hello_world.py      Python script used for automated testing
-├── main
-│   ├── CMakeLists.txt
-│   └── hello_world_main.c
-└── README.md                  This is the file you are currently reading
+```json
+{
+  "up": 1,
+  "right": -1,
+  "X": 1,
+  "O": 0,
+  "start": 0,
+  "select": 0
+}
 ```
 
-For more information on structure and contents of ESP-IDF projects, please refer to Section [Build System](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html) of the ESP-IDF Programming Guide.
+#### `up`
 
-## Troubleshooting
+- 1: Up is pressed
+- 0: Neutral
+- -1: Down is pressed
 
-* Program upload failure
+#### `right`
 
-    * Hardware connection is not correct: run `idf.py -p PORT monitor`, and reboot your board to see if there are any output logs.
-    * The baud rate for downloading is too high: lower your baud rate in the `menuconfig` menu, and try again.
+- 1: Right is pressed
+- 0: Neutral
+- -1: Left is pressed
 
-## Technical support and feedback
+#### `X`
 
-Please use the following feedback channels:
+- 1: X is pressed
+- 0: Neutral
 
-* For technical queries, go to the [esp32.com](https://esp32.com/) forum
-* For a feature request or bug report, create a [GitHub issue](https://github.com/espressif/esp-idf/issues)
+#### `O`
 
-We will get back to you as soon as possible.
+- 1: O is pressed
+- 0: Neutral
+
+#### `start`
+
+- 1: Start is pressed
+- 0: Neutral
+
+#### `select`
+
+- 1: Select is pressed
+- 0: Neutral

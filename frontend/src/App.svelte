@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Heart from './assets/heart.svelte';
+	import Logo from "./assets/logo/index.svelte";
+
 	import Progress from './components/progress.svelte';
 	import classnames from 'classnames';
 	import { onMount } from 'svelte';
@@ -33,13 +35,14 @@
 		userIsCorrect = words.join(' ').startsWith(userText);
 		console.log(userIsCorrect, words, userText);
 	}
-
+  
 	const handleEnterPress = async () => {
 		if (!userIsCorrect) {
 			// animation shake
 			return;
 		}
 		if (progress <= 0) return;
+
 
 		// removing words
 		const userWords = userText.split(' ');
@@ -85,6 +88,7 @@
 			!userIsCorrect && 'neonIn'
 		)}
 	>
+  	<Logo />
 		<div class="mx-auto text-white/80"><p>user score: {score}</p></div>
 
 		<div class="flex flex-1 flex-col items-center justify-center gap-24">
