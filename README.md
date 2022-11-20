@@ -1,5 +1,6 @@
 # uhhhhhhhhh
 
+- to any future employers look no further, this is a terrible, terrible codebase
 ## HackBrunel V2 Submission
 
 ## canna get uhhhhh
