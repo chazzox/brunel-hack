@@ -1,10 +1,10 @@
 #pragma once
 
-#define START_PAD 0
-#define SELECT_PAD 2
-#define X_PAD 3
-#define O_PAD 4
-#define LEFT_PAD 4
-#define RIGHT_PAD 5
-#define UP_PAD 6
-#define DOWN_PAD 7
+#define START_PAD TOUCH_PAD_NUM0
+#define SELECT_PAD TOUCH_PAD_NUM2
+#define X_PAD TOUCH_PAD_NUM3
+#define O_PAD TOUCH_PAD_NUM4
+#define LEFT_PAD TOUCH_PAD_NUM4
+#define RIGHT_PAD TOUCH_PAD_NUM5
+#define UP_PAD TOUCH_PAD_NUM6
+#define DOWN_PAD TOUCH_PAD_NUM7
