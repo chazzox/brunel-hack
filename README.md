@@ -1,6 +1,7 @@
 # uhhhhhhhhh
 
 - to any future employers look no further, this is a terrible, terrible codebase
+- however, if you are interested *why* it is like this, please read our [devpost](https://devpost.com/software/hack-hack-revolution).
 ## HackBrunel V2 Submission
 
 ## canna get uhhhhh
